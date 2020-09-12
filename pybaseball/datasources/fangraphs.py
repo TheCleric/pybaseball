@@ -56,6 +56,8 @@ class FangraphsDataTable(ABC):
     def __call__(
         self,
         start_season: int,
+        stats = None,
+        types = None,
         end_season: int = None,
         league: FanGraphsLeague = FanGraphsLeague.ALL,
         qual: Optional[int] = None,
@@ -71,6 +73,9 @@ class FangraphsDataTable(ABC):
         max_results: int = 1000000,
     ) -> pd.DataFrame:
 
+        stats = self._STATS if stats is None else stats
+        types = self._TYPES if types is None else types
+
         if start_season is None:
             raise ValueError(
                 "You need to provide at least one season to collect data for. "
@@ -81,10 +86,10 @@ class FangraphsDataTable(ABC):
 
         url_parameters = {
             "pos": position.value,
-            "stats": self._STATS.value,
+            "stats": stats.value,
             "lg": league.value,
             "qual": qual if qual is not None else "y",
-            "type": self._TYPES,
+            "type": types,
             "season": end_season,
             "month": month.value,
             "season1": start_season,
@@ -125,9 +130,8 @@ class FangraphsPitchingStats(FangraphsDataTable):
 
     def _postprocess(self, df):
         cols = df.columns.tolist()
-        cols.insert(7, cols.pop(cols.index('WAR')))
+        cols.insert(7, cols.pop(cols.index("WAR")))
         return df.reindex(columns=cols).sort_values(["WAR", "W"], ascending=False)
-
 
 
 class FangraphsTeamBattingStats(FangraphsDataTable):
@@ -144,3 +148,10 @@ class FangraphsTeamFieldingStats(FangraphsDataTable):
 class FangraphsTeamPitchingStats(FangraphsDataTable):
     _STATS = FanGraphsStatTypes.PITCHING
     _TYPES = FanGraphsPitchingStat.ALL()
+
+
+batting_stats = FangraphsBattingStats()
+pitching_stats = FangraphsPitchingStats()
+team_batting = FangraphsTeamBattingStats()
+team_pitching = FangraphsTeamPitchingStats()
+team_fielding = FangraphsTeamFieldingStats()
