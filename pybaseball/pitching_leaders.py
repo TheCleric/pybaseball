@@ -3,7 +3,7 @@ from typing import Optional
 
 import pandas as pd
 
-from pybaseball.datasources.fangraphs import FanGraphs, FanGraphsLeague
+from pybaseball.datasources.fangraphs import FangraphsPitchingStats, FanGraphsLeague
 
 
 def pitching_stats(start_season: int, end_season: int = None, league: str = 'all', qual: Optional[int] = None,
@@ -25,7 +25,7 @@ def pitching_stats(start_season: int, end_season: int = None, league: str = 'all
 
     warnings.warn("pitching_stats is deprecated in favor of FanGraphs().pitching_stats", DeprecationWarning)
 
-    return FanGraphs().pitching_stats(
+    return FangraphsPitchingStats()(
         start_season,
         end_season=end_season,
         league=FanGraphsLeague(league),

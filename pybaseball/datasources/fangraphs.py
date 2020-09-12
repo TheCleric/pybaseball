@@ -99,14 +99,16 @@ class FangraphsDataTable(ABC):
             "page": f"1_{max_results}",
         }
 
-        return self._validate(self._postprocess(
-            self.html_accessor.get_tabular_data_from_options(
-                self._QUERY_ENDPOINT,
-                url_parameters,
-                self._COLUMN_NAME_MAPPER,
-                self._KNOWN_PERCENTAGES,
+        return self._validate(
+            self._postprocess(
+                self.html_accessor.get_tabular_data_from_options(
+                    self._QUERY_ENDPOINT,
+                    url_parameters,
+                    self._COLUMN_NAME_MAPPER,
+                    self._KNOWN_PERCENTAGES,
+                )
             )
-        ))
+        )
 
 
 class FangraphsBattingStats(FangraphsDataTable):
@@ -132,10 +134,11 @@ class FangraphsTeamBattingStats(FangraphsDataTable):
     _TYPES = FanGraphsBattingStat.ALL()
     _COLUMN_NAME_MAPPER = BattingStatsColumnMapper().map
 
+
 class FangraphsTeamFieldingStats(FangraphsDataTable):
     pass
+
 
 class FangraphsTeamPitchingStats(FangraphsDataTable):
     _STATS = FanGraphsStatTypes.PITCHING
     _TYPES = FanGraphsPitchingStat.ALL()
-

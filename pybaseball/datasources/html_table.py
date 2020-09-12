@@ -7,7 +7,7 @@ import requests
 from pybaseball.datahelpers import postprocessing
 
 
-class HTMLAccessor:
+class HTMLTable:
     def __init__(
         self,
         root_url: str,
