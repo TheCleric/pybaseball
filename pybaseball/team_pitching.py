@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from pybaseball.datasources.fangraphs import FangraphsTeamPitchingStats, FanGraphsLeague
-
+from pybaseball.datasources import fangraphs
 
 def team_pitching(start_season: int, end_season: int = None, league: str = 'all', ind: int = 1):
     """
@@ -21,7 +21,7 @@ def team_pitching(start_season: int, end_season: int = None, league: str = 'all'
     
     warnings.warn("team_pitching is deprecated in favor of FanGraphs().team_pitching", DeprecationWarning)
 
-    return FangraphsTeamPitchingStats()(
+    return fangraphs.team_pitching(
         start_season,
         end_season=end_season,
         league=FanGraphsLeague(league),

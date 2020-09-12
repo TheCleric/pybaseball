@@ -5,7 +5,7 @@ import warnings
 
 from pybaseball.datasources.fangraphs import FangraphsTeamFieldingStats, FanGraphsLeague
 from pybaseball.datahelpers import postprocessing
-
+from pybaseball.datasources import fangraphs
 
 def team_fielding(start_season: int, end_season: int = None, league: str = 'all', ind: int = 1):
     """
@@ -21,7 +21,7 @@ def team_fielding(start_season: int, end_season: int = None, league: str = 'all'
 
     warnings.warn("team_fielding is deprecated in favor of FanGraphs().team_fielding", DeprecationWarning)
 
-    return FangraphsTeamFieldingStats()(
+    return fangraphs.team_fielding(
         start_season,
         end_season=end_season,
         league=FanGraphsLeague(league),
