@@ -7,9 +7,15 @@ import requests
 from pybaseball.datahelpers import postprocessing
 
 
-class HTMLTable:
-    def __init__(self, root_url: str, headings_xpath: str, data_rows_xpath: str, data_cell_xpath: str,
-                 table_class: str = None):
+class HTMLAccessor:
+    def __init__(
+        self,
+        root_url: str,
+        headings_xpath: str,
+        data_rows_xpath: str,
+        data_cell_xpath: str,
+        table_class: str = None,
+    ):
         self.root_url = root_url
         self.table_class = table_class
         self.headings_xpath = headings_xpath.format(TABLE_XPATH=self.table_xpath)
@@ -20,18 +26,26 @@ class HTMLTable:
     def table_xpath(self) -> str:
         if self.table_class:
             return f'//table[@class="{self.table_class}"]'
-        return '//table'
+        return "//table"
 
-    def _create_url(self, url_base: str, query_string_params: Dict[str, Union[str, int]] = {}):
-        query_string = ''
+    def _create_url(
+        self, url_base: str, query_string_params: Dict[str, Union[str, int]] = {}
+    ):
+        query_string = ""
 
         if query_string_params and isinstance(query_string_params, dict):
-            query_string = "?" + "&".join([f"{key}={value}" for key, value in query_string_params.items()])
+            query_string = "?" + "&".join(
+                [f"{key}={value}" for key, value in query_string_params.items()]
+            )
 
         return url_base + query_string
 
-    def get_tabular_data_from_element(self, element: lxml.etree.Element, column_name_mapper: Callable = None,
-                                      known_percentages: List[str] = []) -> pd.DataFrame:
+    def get_tabular_data_from_element(
+        self,
+        element: lxml.etree.Element,
+        column_name_mapper: Callable = None,
+        known_percentages: List[str] = [],
+    ) -> pd.DataFrame:
         headings = element.xpath(self.headings_xpath)
 
         if column_name_mapper:
@@ -40,7 +54,9 @@ class HTMLTable:
         data_rows_dom = element.xpath(self.data_rows_xpath)
         data_rows = [
             [
-                postprocessing.try_parse(y, headings[index], known_percentages=known_percentages)
+                postprocessing.try_parse(
+                    y, headings[index], known_percentages=known_percentages
+                )
                 for index, y in enumerate(x.xpath(self.data_cell_xpath))
             ]
             for x in data_rows_dom
@@ -50,18 +66,26 @@ class HTMLTable:
 
         return fg_data
 
-    def get_tabular_data_from_html(self, html: Union[str, bytes], column_name_mapper: Callable = None,
-                                   known_percentages: List[str] = []) -> pd.DataFrame:
+    def get_tabular_data_from_html(
+        self,
+        html: Union[str, bytes],
+        column_name_mapper: Callable = None,
+        known_percentages: List[str] = [],
+    ) -> pd.DataFrame:
         html_dom = lxml.etree.HTML(html)
 
         return self.get_tabular_data_from_element(
             html_dom,
             column_name_mapper=column_name_mapper,
-            known_percentages=known_percentages
+            known_percentages=known_percentages,
         )
 
-    def get_tabular_data_from_url(self, url: str, column_name_mapper: Callable = None,
-                                known_percentages: List[str] = []) -> pd.DataFrame:
+    def get_tabular_data_from_url(
+        self,
+        url: str,
+        column_name_mapper: Callable = None,
+        known_percentages: List[str] = [],
+    ) -> pd.DataFrame:
         response = requests.get(self.root_url + url)
 
         if response.status_code > 399:
@@ -72,5 +96,12 @@ class HTMLTable:
         return self.get_tabular_data_from_html(
             response.content,
             column_name_mapper=column_name_mapper,
-            known_percentages=known_percentages
+            known_percentages=known_percentages,
+        )
+
+    def get_tabular_data_from_options(self, base_url, query_params, column_name_mapper, known_percentages):
+        return self.get_tabular_data_from_url(
+            self._create_url(base_url, query_params),
+            column_name_mapper=column_name_mapper,
+            known_percentages=known_percentages,
         )
