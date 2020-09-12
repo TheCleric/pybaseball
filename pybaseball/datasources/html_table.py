@@ -49,7 +49,7 @@ class HTMLTable:
         headings = element.xpath(self.headings_xpath)
 
         if column_name_mapper:
-            headings = [column_name_mapper(h) for h in headings]
+            headings = list(column_name_mapper(headings))
 
         data_rows_dom = element.xpath(self.data_rows_xpath)
         data_rows = [

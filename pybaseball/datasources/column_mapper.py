@@ -1,4 +1,5 @@
 
+
 class GenericColumnMapper:
 
     def __init__(self):
@@ -6,6 +7,11 @@ class GenericColumnMapper:
 
     def _short_circuit(self, column_name):
         return ""
+
+    def map_list(self, column_names):
+        self.call_counts = {}
+        for column_name in column_names:
+            yield self.map(column_name)
 
     def map(self, column_name: str) -> str:
         self.call_counts[column_name] = self.call_counts.get(column_name, 0) + 1

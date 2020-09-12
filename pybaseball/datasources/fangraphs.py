@@ -35,7 +35,7 @@ class FangraphsDataTable(ABC):
     _QUERY_ENDPOINT = _FG_LEADERS_URL
     _STATS = None
     _TYPES = None
-    _COLUMN_NAME_MAPPER = GenericColumnMapper().map
+    _COLUMN_NAME_MAPPER = GenericColumnMapper().map_list
     _KNOWN_PERCENTAGES = []
 
     def __init__(self):
@@ -112,7 +112,7 @@ class FangraphsDataTable(ABC):
 class FangraphsBattingStats(FangraphsDataTable):
     _STATS = FanGraphsStatTypes.BATTING
     _TYPES = FanGraphsBattingStat.ALL()
-    _COLUMN_NAME_MAPPER = BattingStatsColumnMapper().map
+    _COLUMN_NAME_MAPPER = BattingStatsColumnMapper().map_list
     _KNOWN_PERCENTAGES = ["GB/FB"]
 
     def _postprocess(self, df):
@@ -124,17 +124,21 @@ class FangraphsPitchingStats(FangraphsDataTable):
     _TYPES = FanGraphsPitchingStat.ALL()
 
     def _postprocess(self, df):
-        return df.sort_values(["WAR", "W"], ascending=False)
+        cols = df.columns.tolist()
+        cols.insert(7, cols.pop(cols.index('WAR')))
+        return df.reindex(columns=cols).sort_values(["WAR", "W"], ascending=False)
+
 
 
 class FangraphsTeamBattingStats(FangraphsDataTable):
     _STATS = FanGraphsStatTypes.BATTING
     _TYPES = FanGraphsBattingStat.ALL()
-    _COLUMN_NAME_MAPPER = BattingStatsColumnMapper().map
+    _COLUMN_NAME_MAPPER = BattingStatsColumnMapper().map_list
 
 
 class FangraphsTeamFieldingStats(FangraphsDataTable):
-    pass
+    _STATS = FanGraphsStatTypes.FIELDING
+    _TYPES = FanGraphsFieldingStat.ALL()
 
 
 class FangraphsTeamPitchingStats(FangraphsDataTable):
