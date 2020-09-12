@@ -56,8 +56,6 @@ class FangraphsDataTable(ABC):
     def __call__(
         self,
         start_season: int,
-        stats: FanGraphsStatTypes,
-        types: str,
         end_season: int = None,
         league: FanGraphsLeague = FanGraphsLeague.ALL,
         qual: Optional[int] = None,
